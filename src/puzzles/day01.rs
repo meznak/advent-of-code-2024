@@ -1,6 +1,8 @@
+use std::{collections::HashMap, hash::Hash};
+
 use crate::RunError;
 
-pub fn main(part: u8, data: &str) -> Result<i32, RunError> {
+pub fn main(part: u8, data: &str) -> Result<usize, RunError> {
     let parsed_data = parse_data(data)?;
 
     match part {
@@ -10,22 +12,22 @@ pub fn main(part: u8, data: &str) -> Result<i32, RunError> {
     }
 }
 
-fn parse_data(data: &str) -> Result<[Vec<i32>; 2], RunError> {
+fn parse_data(data: &str) -> Result<[Vec<usize>; 2], RunError> {
     let lines: Vec<&str> = data[..].split('\n').collect();
 
-    let mut lists: [Vec<i32>; 2] = [vec![], vec![]];
+    let mut lists: [Vec<usize>; 2] = [vec![], vec![]];
 
     for line in lines {
         let nums: Vec<&str> = line.split_whitespace().collect();
-        lists[0].push(nums[0].parse::<i32>()?);
-        lists[1].push(nums[1].parse::<i32>()?);
+        lists[0].push(nums[0].parse::<usize>()?);
+        lists[1].push(nums[1].parse::<usize>()?);
     }
 
     Ok(lists)
 
 }
 
-fn part1(values: &[Vec<i32>; 2]) -> Result<i32, RunError> {
+fn part1(values: &[Vec<usize>; 2]) -> Result<usize, RunError> {
     // Sort lists, pair members by rank, determine distance between them.
     // Return sum of those distances.
 
@@ -34,20 +36,31 @@ fn part1(values: &[Vec<i32>; 2]) -> Result<i32, RunError> {
     lists[0].sort();
     lists[1].sort();
 
-    let mut diff_sum: i32 = 0;
+    let mut diff_sum: usize = 0;
 
     for i in 0..lists[0].len() {
-        diff_sum += (lists[0][i] - lists[1][i]).abs()
+        diff_sum += (lists[0][i] as i32- lists[1][i] as i32).abs() as usize
     }
 
     Ok(diff_sum)
 
 }
 
-fn part2(values: &[Vec<i32>; 2]) -> Result<i32, RunError> {
-    // What's the goal?
+fn part2(values: &[Vec<usize>; 2]) -> Result<usize, RunError> {
+    // Count occurrences of each left list number in the right list.
+    // Multiply left list numbers by theat count.
+    // Sum those products
 
-    todo!();
+    let mut counts: HashMap<usize, usize> = HashMap::new();
+    let mut total: usize = 0;
+
+    for &num in &values[0] {
+        let value: usize = *counts.entry(num).or_insert(values[1].iter().filter(|&x| *x == num).count());
+
+        total += num * value;
+    }
+
+    Ok(total)
 }
 
 #[cfg(test)]
@@ -60,8 +73,8 @@ mod tests {
 1   3
 3   9
 3   3";
-    const SAMPLE_DATA: [[i32; 6]; 2] = [[3,4,2,1,3,3], [4,3,5,3,9,3]];
-    static SAMPLE_GOALS: [i32; 2] = [11, 0];
+    const SAMPLE_DATA: [[usize; 6]; 2] = [[3,4,2,1,3,3], [4,3,5,3,9,3]];
+    static SAMPLE_GOALS: [usize; 2] = [11, 31];
 
     #[test]
     fn test_parse() {
