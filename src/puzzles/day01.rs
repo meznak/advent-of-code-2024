@@ -29,7 +29,19 @@ fn part1(values: &[Vec<i32>; 2]) -> Result<i32, RunError> {
     // Sort lists, pair members by rank, determine distance between them.
     // Return sum of those distances.
 
-    todo!();
+    let mut lists = values.clone();
+
+    lists[0].sort();
+    lists[1].sort();
+
+    let mut diff_sum: i32 = 0;
+
+    for i in 0..lists[0].len() {
+        diff_sum += (lists[0][i] - lists[1][i]).abs()
+    }
+
+    Ok(diff_sum)
+
 }
 
 fn part2(values: &[Vec<i32>; 2]) -> Result<i32, RunError> {
